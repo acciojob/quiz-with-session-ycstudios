@@ -1,4 +1,69 @@
 //your JS code here.
+const questionsElement = document.getElementById("questions");
+const submitButton = document.getElementById("submit");
+const scoreElement = document.getElementById("score");
+
+// Load stored progress from session storage
+const savedProgress = JSON.parse(sessionStorage.getItem("progress")) || {};
+
+// Render the quiz questions
+function renderQuestions() {
+  questionsElement.innerHTML = ""; // Clear existing content
+
+  questions.forEach((question, i) => {
+    const questionElement = document.createElement("div");
+    questionElement.innerHTML = `<p>${question.question}</p>`;
+
+    question.choices.forEach((choice) => {
+      const choiceElement = document.createElement("input");
+      choiceElement.setAttribute("type", "radio");
+      choiceElement.setAttribute("name", `question-${i}`);
+      choiceElement.setAttribute("value", choice);
+      if (savedProgress[i] === choice) {
+        choiceElement.checked = true;
+      }
+      choiceElement.addEventListener("change", () => saveProgress(i, choice));
+
+      const choiceLabel = document.createElement("label");
+      choiceLabel.appendChild(choiceElement);
+      choiceLabel.appendChild(document.createTextNode(choice));
+
+      questionElement.appendChild(choiceLabel);
+    });
+    
+    questionsElement.appendChild(questionElement);
+  });
+}
+
+// Save user selections to session storage
+function saveProgress(index, choice) {
+  savedProgress[index] = choice;
+  sessionStorage.setItem("progress", JSON.stringify(savedProgress));
+}
+
+// Calculate and display the score
+function calculateScore() {
+  let score = 0;
+  questions.forEach((question, i) => {
+    if (savedProgress[i] === question.answer) {
+      score++;
+    }
+  });
+  localStorage.setItem("score", score);
+  scoreElement.textContent = `Your score is ${score} out of 5.`;
+}
+
+// Load stored score if available
+const storedScore = localStorage.getItem("score");
+if (storedScore !== null) {
+  scoreElement.textContent = `Your score is ${storedScore} out of 5.`;
+}
+
+// Event listener for submit button
+submitButton.addEventListener("click", calculateScore);
+
+// Initialize the quiz
+renderQuestions();
 
 // Do not change code below this line
 // This code will just display the questions to the screen
